@@ -5,7 +5,13 @@
  *   OPENAI_API_KEY           必填
  *   OPENAI_BASE_URL          可选，走 OpenAI 兼容网关（DeepSeek / 自建等）时设置
  *   OPENAI_MODEL             可选，默认 gpt-5.5
- *   OPENAI_REASONING_EFFORT  可选，low | medium | high；不设则不传（兼容不支持该参数的网关）
+ *   OPENAI_REASONING_EFFORT  可选，none | low | medium | high；不设则不传（兼容不支持该参数的网关）
+ *
+ * 本机 Ollama 示例（OrbStack VM 内访问宿主机）：
+ *   OPENAI_BASE_URL=http://host.orb.internal:11434/v1
+ *   OPENAI_API_KEY=ollama
+ *   OPENAI_MODEL=qwen3.5:122b
+ *   OPENAI_REASONING_EFFORT=none
  *
  * 前端（InsightPanel / ChatPanel / heming）约定的流格式：
  *   data: {"delta":{"text":"..."}}\n\n   …   data: [DONE]\n\n
@@ -15,8 +21,9 @@ import type { ChatCompletionCreateParamsStreaming } from 'openai/resources/chat/
 
 export const MODEL = process.env.OPENAI_MODEL || 'gpt-5.5';
 
-type Effort = 'low' | 'medium' | 'high';
-const EFFORTS: Effort[] = ['low', 'medium', 'high'];
+// 'none' 用于 Ollama 等本地推理关闭思考模式（qwen3.5 等思考型模型开着思考时正文会被挤空）
+type Effort = 'none' | 'low' | 'medium' | 'high';
+const EFFORTS: Effort[] = ['none', 'low', 'medium', 'high'];
 export const REASONING_EFFORT: Effort | undefined = EFFORTS.includes(process.env.OPENAI_REASONING_EFFORT as Effort)
   ? (process.env.OPENAI_REASONING_EFFORT as Effort)
   : undefined;
